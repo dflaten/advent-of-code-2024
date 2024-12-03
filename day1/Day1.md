@@ -1,4 +1,4 @@
---- Day 1: Historian Hysteria ---
+# Day 1: Historian Hysteria
 The problem here boiled down to having two lists and doing two small tasks with them.
 First the lists needed to be sorted and the differences between the sorted lists needed to be added.
 

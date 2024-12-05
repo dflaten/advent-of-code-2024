@@ -1,5 +1,3 @@
-
-
 #!/usr/bin/env python
 import argparse
 import re
@@ -13,7 +11,6 @@ def retrieve_string_from_path(path_to_file: str) -> str:
         lines = file.readlines()
         # combine all lines into a single string and use \n to separate them
         return "".join(lines)
-        import re
 
 DONT_DO_PATTERN = re.compile(r"don't\(\).*?(?:do\(\)|$)", re.DOTALL)
 

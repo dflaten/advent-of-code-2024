@@ -1,133 +1,101 @@
-
 #!/usr/bin/env python
 import argparse
 import numpy as np
 
-def convert_text_to_grid(path_to_file: str) -> list[list[str]]:
+def convert_text_to_grid(path_to_file: str) -> np.ndarray:
     '''
-    Converts the text file at the path to a grid for traversal.
+    Converts the text file at the path to a numpy array grid for traversal.
     '''
     with open(path_to_file, 'r') as file:
-        return [list(line.strip()) for line in file]
-        # Direction vectors for up, right, down, left
+        return np.array([list(line.strip()) for line in file])
 
-def guard_walk_map(map, guard, locations_visited) -> tuple[np.ndarray, np.ndarray]:
+def is_valid_position(current_position: tuple, shape: tuple) -> bool:
+    '''Check if position is within map boundaries'''
+    return 0 <= current_position[0] < shape[0] and 0 <= current_position[1] < shape[1]
+
+def guard_walk_map(map_array: np.ndarray, start_pos: tuple) -> set:
     '''
     Guard walks map until they hit the edge of the map.
-    Directions
-    < - left
-    > - right
-    ^ - up
-    v - down
-    # - obstacle
+    Directions: < (left), > (right), ^ (up), v (down), # (obstacle)
+    Returns set of visited positions.
     '''
-    updated_locations_visited = locations_visited
-    current_guard_location = guard
-
     directions = {
-        'up': np.array([-1, 0]),
-        'right': np.array([0, 1]),
-        'down': np.array([1, 0]),
-        'left': np.array([0, -1])
+        '<': (0, -1),
+        '>': (0, 1),
+        '^': (-1, 0),
+        'v': (1, 0)
     }
 
+    turn_right = {
+        '<': '^',
+        '^': '>',
+        '>': 'v',
+        'v': '<'
+    }
+
+    visited = set()
+    current_pos = start_pos
+    visited.add(current_pos)
+
+    # Keep track of position+direction combinations to detect cycles
+    state_history = set()
+
     while True:
-        if map[current_guard_location] == '<':
-            #check for end of map, if end of map, move to off map location and return results.
-            possible_guard_location = directions['left'] + current_guard_location
-            if not np.isin(map, possible_guard_location):
-                return updated_locations_visited
-            # if obstacle then turn right
-            if possible_guard_location == '#':
-                map[current_guard_location] = '^'
-            else:
-                # Traverse to left
-                possible_guard_location = '<'
-                current_guard_location = '.'
-                current_guard_location = possible_guard_location
-                updated_locations_visited.append(current_guard_location)
-                continue
+        current_symbol = map_array[current_pos]
+        if current_symbol not in directions:
+            break
 
-        if map[current_guard_location] == '>':
-            #check for end of map, if end of map, move to off map location and return results.
-            possible_guard_location = directions['right'] + current_guard_location
-            if not np.isin(map, possible_guard_location):
-                return updated_locations_visited
-            # if obstacle then turn right
-            if possible_guard_location == '#':
-                map[current_guard_location] = 'v'
-            else:
-                # Traverse to left
-                possible_guard_location = '>'
-                current_guard_location = '.'
-                current_guard_location = possible_guard_location
-                updated_locations_visited.append(current_guard_location)
-                continue
+        state = (current_pos, current_symbol)
+        if state in state_history:
+            break
+        state_history.add(state)
 
-        if map[current_guard_location] == 'v':
-            #check for end of map, if end of map, move to off map location and return results.
-            possible_guard_location = directions['down'] + current_guard_location
-            if not np.isin(map, possible_guard_location):
-                return updated_locations_visited
-            # if obstacle then turn right
-            if possible_guard_location == '#':
-                map[current_guard_location] = '<'
-            else:
-                # Traverse down
-                possible_guard_location = 'v'
-                current_guard_location = '.'
-                current_guard_location = possible_guard_location
-                updated_locations_visited.append(current_guard_location)
-                continue
+        # Calculate next position
+        dist_y, dist_x = directions[current_symbol]
+        next_pos = (current_pos[0] + dist_y, current_pos[1] + dist_x)
 
-        if map[current_guard_location] == '^':
-            #check for end of map, if end of map, move to off map location and return results.
-            print('before')
-            print(current_guard_location)
-            direction = directions['up']
-            possible_guard_location = current_guard_location + direction
-            print('possum')
-            print(possible_guard_location)
-            if not np.isin(map, possible_guard_location):
-                return updated_locations_visited
-            # if obstacle then turn right
-            if possible_guard_location == '#':
-                map[current_guard_location] = '>'
-            else:
-                # Traverse down
-                possible_guard_location = '^'
-                current_guard_location = '.'
-                current_guard_location = possible_guard_location
-                updated_locations_visited.append(current_guard_location)
-                continue
+        # Check if next position is valid and not an obstacle
+        if not is_valid_position(next_pos, map_array.shape):
+            break
 
-    return current_guard_location
+        if map_array[next_pos] == '#':
+            # Turn right when hitting obstacle
+            map_array[current_pos] = turn_right[current_symbol]
+        else:
+            # Move to next position
+            map_array[current_pos] = '.'
+            map_array[next_pos] = current_symbol
+            current_pos = next_pos
+            visited.add(current_pos)
 
+    return visited
 
-def find_all_points_visited(map_grid: list[list[str]]) -> int:
+def find_all_points_visited(map_grid: np.ndarray) -> int:
     '''
     Find all points visited by the guard.
     '''
-    locations_visited = []
-    map = np.array(map_grid)
-    print(map)
-    # find the guard where the guard is the character <, >, ^, or v
-    guard_current_location = np.where(np.isin(map, ['<', '>', '^', 'v']))
-    guard_current_location = [tuple(guard_current_location)]
-    #guard_direction_facing = map[guard_current_location]
-    #print(guard_direction_facing[0])
-    locations_visited.append(guard_current_location)
-    locations_visited = guard_walk_map(map, guard_current_location, locations_visited)
+    # Find guard's starting position, should only be one
+    guard_chars = {'<', '>', '^', 'v'}
+    guard_positions = np.where(np.isin(map_grid, list(guard_chars)))
+    if len(guard_positions[0]) == 0 or len(guard_positions[0]) > 1:
+        return 0
 
-    return len(locations_visited)
+    start_pos = (guard_positions[0][0], guard_positions[1][0])
+    visited_positions = guard_walk_map(map_grid, start_pos)
+
+    return len(visited_positions)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Advent of Code 2024 - Day 6")
+    parser = argparse.ArgumentParser(description="Guard Path Tracker")
     parser.add_argument("--input", type=str, help="Path to input file.")
-    parser.add_argument("--find_points_visited", action='store_true', help="Find all the valid page orderings in the pages to produce file that follow the rules in the rule file.")
+    parser.add_argument("--find_points_visited", action='store_true',
+                       help="Find all points visited by the guard.")
+    parser.add_argument("--place_obstruction", action='store_true',
+                       help="Find a place to set an obstruction so the guard gets stuck in a loop.")
     args = parser.parse_args()
+
     map_grid = convert_text_to_grid(args.input)
-    print('grid')
+
     if args.find_points_visited:
         result = find_all_points_visited(map_grid)
         print(f"Found {result} points visited by the guard.")

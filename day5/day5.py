@@ -1,26 +1,30 @@
 #!/usr/bin/env python
 import argparse
+from functools import cmp_to_key
 
 RULES_FILE_PATH = "rules.txt"
 PAGES_TO_PRODUCE_FILE_PATH = "pages_to_produce.txt"
 
-def retrieve_rules(path_to_file: str) -> dict[int, list[int]]:
+def retrieve_rules(path_to_file: str) -> list[tuple[int, int]]:
     '''
     Retrieves the rules from the file path.
     '''
-    pairs = []
-    rules = {}
+    rules = []
     with open(path_to_file, 'r') as file:
         lines = file.readlines()
         for line in lines:
             val1, val2 = line.split('|')
-            pairs.append((int(val1), int(val2)))
-        for pair in pairs:
-            if pair[0] in rules:
-                rules[pair[0]].append(pair[1])
-            else:
-                rules[pair[0]] = [pair[1]]
+            rules.append((int(val1), int(val2)))
     return rules
+
+def rules_map(rules: list[tuple[int, int]]) -> dict[int, list[int]]:
+    rules_map = {}
+    for rule in rules:
+        if rule[0] in rules_map:
+            rules_map[rule[0]].append(rule[1])
+        else:
+            rules_map[rule[0]] = [rule[1]]
+    return rules_map
 
 def retrieve_pages_to_produce(path_to_file: str) -> list[list[int]]:
     '''
@@ -63,14 +67,30 @@ def find_valid_page_ordering(rules, pages_to_produce):
             vald_sections.append(section)
     return sum_middle_elements(vald_sections)
 
+def sort_by_rules(rules, update):
+    return sorted(update, key=cmp_to_key(lambda x, y: -1 if (x,y) in rules else 1))
+
+def fix_incorrectly_ordered_sections(rules, rules_map, pages_to_produce):
+    invalid_sections = []
+    fixed_sections = []
+    for section in pages_to_produce:
+        if not is_valid_section(section, rules_map):
+            invalid_sections.append(section)
+    for invalid_section in invalid_sections:
+        fixed_sections.append(sort_by_rules(rules, invalid_section))
+    return sum_middle_elements(fixed_sections)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Advent of Code 2024 - Day 5")
     parser.add_argument("--find_valid_page_ordering", action='store_true', help="Find all the valid page orderings in the pages to produce file that follow the rules in the rule file.")
+    parser.add_argument("--fix_incorrectly_ordered_sections", action='store_true', help="Make all the invalid page orderings ordered by reording as needed.")
     args = parser.parse_args()
     rules = retrieve_rules(RULES_FILE_PATH)
+    rules_map = rules_map(rules)
     pages_to_produce = retrieve_pages_to_produce(PAGES_TO_PRODUCE_FILE_PATH)
     if args.find_valid_page_ordering:
-        # 5747 is too low which means I am marking some sections as invalid that are actually valid.
-        result = find_valid_page_ordering(rules, pages_to_produce)
+        result = find_valid_page_ordering(rules_map, pages_to_produce)
         print(f"Result of adding all middle elements in the valid page ordering is {result}")
+    if args.fix_incorrectly_ordered_sections:
+        result = fix_incorrectly_ordered_sections(rules, rules_map, pages_to_produce)
+        print(f"Result of adding all middle elements in the fixed page ordering is {result}")

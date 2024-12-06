@@ -38,17 +38,18 @@ def guard_walk_map(map_array: np.ndarray, start_pos: tuple) -> set:
     visited.add(current_pos)
 
     # Keep track of position+direction combinations to detect cycles
-    state_history = set()
+    locations_visited = set()
 
     while True:
         current_symbol = map_array[current_pos]
+        # Just adding some validation that probably isn't needed.'
         if current_symbol not in directions:
             break
 
-        state = (current_pos, current_symbol)
-        if state in state_history:
+        current_location = (current_pos, current_symbol)
+        if current_location in locations_visited:
             break
-        state_history.add(state)
+        locations_visited.add(current_location)
 
         # Calculate next position
         dist_y, dist_x = directions[current_symbol]
@@ -59,7 +60,6 @@ def guard_walk_map(map_array: np.ndarray, start_pos: tuple) -> set:
             break
 
         if map_array[next_pos] == '#':
-            # Turn right when hitting obstacle
             map_array[current_pos] = turn_right[current_symbol]
         else:
             # Move to next position

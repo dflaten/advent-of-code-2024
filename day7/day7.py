@@ -46,8 +46,6 @@ def find_valid_lines(lines: list[list[int]], use_concat = False) -> int:
     '''
     total = 0
     for line in lines:
-        if len(line) < 2:
-            continue
         target = line[0]
         operands = line[1:]
         if can_reach_target(target=target, nums=operands, current=None, use_concat=use_concat):

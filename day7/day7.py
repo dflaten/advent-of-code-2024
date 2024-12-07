@@ -19,8 +19,6 @@ def can_reach_target(target: int, nums: list[int], current: Optional[int], index
     using only + and * operations in the original order
     '''
     if current is None:
-        if not nums:
-            return False
         return can_reach_target(target, nums, nums[0], 1,use_concat)
 
     if index >= len(nums):

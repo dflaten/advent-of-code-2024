@@ -90,7 +90,7 @@ if __name__ == "__main__":
     parser.add_argument("--input", type=str, help="Path to input file.")
     parser.add_argument("--find_points_visited", action='store_true',
                        help="Find all points visited by the guard.")
-    parser.add_argument("--place_obstruction", action='store_true',
+    parser.add_argument("--find_obstruction_points", action='store_true',
                        help="Find a place to set an obstruction so the guard gets stuck in a loop.")
     args = parser.parse_args()
 
@@ -99,3 +99,6 @@ if __name__ == "__main__":
     if args.find_points_visited:
         result = find_all_points_visited(map_grid)
         print(f"Found {result} points visited by the guard.")
+    if args.find_obstruction_points:
+        result = find_all_points_visited(map_grid)
+        print(f"Found {result} places to put an obstruction.")

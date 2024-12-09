@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import numpy as np
+from collections import defaultdict
 
 def convert_text_to_grid(path_to_file: str) -> np.ndarray:
     '''
@@ -10,16 +11,13 @@ def convert_text_to_grid(path_to_file: str) -> np.ndarray:
         return np.array([list(line.strip()) for line in file])
 
 def find_satellites_positions(grid: np.ndarray) -> dict[str, list[tuple]]:
-    satellite_positions_map = {}
+    satellite_positions_map = defaultdict(list[tuple])
     for i in range(grid.shape[0]):
         for j in range(grid.shape[1]):
             current_char = str(grid[i, j])
             if current_char == '.':
                 continue
-            if current_char in satellite_positions_map:
-                satellite_positions_map[current_char].append((i, j))
-            else:
-                satellite_positions_map[current_char] = [(i, j)]
+            satellite_positions_map[current_char].append((i, j))
 
     return satellite_positions_map
 

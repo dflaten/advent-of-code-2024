@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import argparse
+from re import sub
 import numpy as np
 from typing import Optional
 
-INPUT = "small-input.txt"
+INPUT = "input.txt"
 directions = [
     (0, -1),
     (0, 1),
@@ -22,19 +23,22 @@ def is_valid_position(current_position: tuple, shape: tuple) -> bool:
     return 0 <= current_position[0] < shape[0] and 0 <= current_position[1] < shape[1]
 
 
-def recurse_find_paths(current_position: tuple[int, int], map: np.ndarray, current_path: Optional[list[tuple[int, int]]] = None) -> set:
+def find_reachable_nines(current_position: tuple[int, int], map: np.ndarray, current_path: Optional[list[tuple[int, int]]] = None) -> set:
     if current_path is None:
         current_path = [current_position]
-    if map[current_position] == 9:
-        return {tuple(current_path)}
-    paths = set()
+
+    current_value = map[current_position]
+    reachable_nines = set()
+    if current_value == 9:
+        reachable_nines.add(current_position)
+        return reachable_nines
     for direction in directions:
         next_position = (current_position[0] + direction[0], current_position[1] + direction[1])
         if is_valid_position(next_position, map.shape) and map[next_position] == map[current_position] + 1:
             if next_position not in current_path:
                 new_path = current_path + [next_position]
-                paths.update(recurse_find_paths(next_position, map, new_path))
-    return paths
+                reachable_nines.update(find_reachable_nines(next_position, map, new_path))
+    return reachable_nines
 
 
 def find_trail_scores_from_position(x: int, y: int, map: np.ndarray) -> int:
@@ -42,17 +46,17 @@ def find_trail_scores_from_position(x: int, y: int, map: np.ndarray) -> int:
     From the starting position, traverse the map counting how many ways you can
     get to 9 on the map from the starting position.
     '''
-    all_paths = recurse_find_paths((x,y), map,)
-    for path in all_paths:
-    # print the map with only the path characters in it, all others should have a '.'
-        print()
-        for x in range(map.shape[0]):
-            for y in range(map.shape[1]):
-                if (x, y) in path:
-                    print(map[x, y], end="")
-                else:
-                    print(".", end="")
-            print()
+    all_paths = find_reachable_nines((x,y), map,)
+    # for path in all_paths:
+    # # print the map with only the path characters in it, all others should have a '.'
+    #     print()
+    #     for x in range(map.shape[0]):
+    #         for y in range(map.shape[1]):
+    #             if (x, y) in path:
+    #                 print(map[x, y], end="")
+    #             else:
+    #                 print(".", end="")
+    #         print()
 
 
 
@@ -79,4 +83,6 @@ if __name__ == "__main__":
 
     if args.find_trails:
         result = find_sum_of_trail_scores(topographical_map)
+        # Small input should be 36
+        # Regular input 825
         print(f"The sum of all valid trail scores in the grid is: {result}")

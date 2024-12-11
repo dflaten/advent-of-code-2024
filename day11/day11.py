@@ -43,6 +43,6 @@ if __name__ == "__main__":
 
     starting_numbers= parse_input(INPUT)
     if args.count_numbers:
-        iterations = 75
+        iterations = 25
         result = preform_iterations(starting_numbers, number_of_iterations=iterations)
         print(f"The number of numbers after {iterations} iterations: {result}")

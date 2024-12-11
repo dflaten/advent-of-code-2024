@@ -29,15 +29,8 @@ def determine_new_numbers(list_of_numbers: list[int]) -> list[int]:
     return new_numbers
 
 def preform_iterations(starting_numbers: list[int], number_of_iterations: int) -> int:
-    '''
-    Preform the specified number of iterations on the starting numbers
-    If the number is 0, it is replaced by the number 1.
-    If the number is even, it is replaced by two numbers. The left half of the digits are one number, and the right half of the digits are the other. (The new numbers don't keep extra leading zeroes: 1000 would become 10 and 0.)
-    If none of the other rules apply, the number is replaced by the old number multiplied by 2024.
-    '''
     numbers = starting_numbers
     for i in range(number_of_iterations):
-        print(f"After iteration {i}: {numbers}")
         numbers = determine_new_numbers(numbers)
     return len(numbers)
 
@@ -49,8 +42,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     starting_numbers= parse_input(INPUT)
-    print(starting_numbers)
     if args.count_numbers:
-        iterations = 25
+        iterations = 75
         result = preform_iterations(starting_numbers, number_of_iterations=iterations)
         print(f"The number of numbers after {iterations} iterations: {result}")

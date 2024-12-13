@@ -4,7 +4,7 @@ from itertools import zip_longest
 from dataclasses import dataclass
 from pulp import LpProblem, LpVariable, LpMinimize, LpInteger, value, PULP_CBC_CMD, LpStatusOptimal
 import re
-INPUT = "input.txt"
+INPUT = "small-input.txt"
 
 @dataclass
 class PrizeMachine:
@@ -53,21 +53,29 @@ def parse_input(path_to_file: str) -> list[PrizeMachine]:
     return prize_machines
 
 
-def get_min_tokens(prize_machine: PrizeMachine) -> int:
+def get_min_tokens(prize_machine: PrizeMachine, adjusted=False) -> int:
+
     prob = LpProblem("Minimum_Number_Of_Tokens_Puzzle", LpMinimize)
 
     # LpInteger since we need whole numbers
-    a_presses = LpVariable("a", lowBound=0, cat=LpInteger)
-    b_presses = LpVariable("b", lowBound=0, cat=LpInteger)
+    a_presses = LpVariable("a", lowBound=0, upBound=100000000000000, cat=LpInteger)
+    b_presses = LpVariable("b", lowBound=0, upBound=100000000000000, cat=LpInteger)
 
     # Define objective function (minimize tokens)
     prob += 3 * a_presses + b_presses, "Number of tokens"
 
     # Define constraints
-    prob += prize_machine.button_a_x * a_presses + prize_machine.button_b_x * b_presses == prize_machine.prize_location[0], "X Movement"
-    prob += prize_machine.button_a_y * a_presses + prize_machine.button_b_y * b_presses == prize_machine.prize_location[1], "Y Movement"
+    x_prize_location = prize_machine.prize_location[0]
+    y_prize_location = prize_machine.prize_location[1]
+    if adjusted:
+        x_prize_location = x_prize_location + 10000000000000
+        y_prize_location = y_prize_location + 10000000000000
+    print(x_prize_location, y_prize_location)
+    prob += prize_machine.button_a_x * a_presses + prize_machine.button_b_x * b_presses == x_prize_location, "X Movement"
+    prob += prize_machine.button_a_y * a_presses + prize_machine.button_b_y * b_presses == y_prize_location, "Y Movement"
 
-    status = prob.solve(PULP_CBC_CMD(msg=False))
+    status = prob.solve(PULP_CBC_CMD(msg=True, presolved=False, options=['LpInteger=1*10**-100']))
+    print(status)
 
     if status == LpStatusOptimal:
         a_value = int(value(a_presses))
@@ -79,10 +87,10 @@ def get_min_tokens(prize_machine: PrizeMachine) -> int:
     # If there is no solution, return 0
     return 0
 
-def determine_min_tokens(list_of_prize_locations: list[PrizeMachine]) -> int:
+def determine_min_tokens(list_of_prize_locations: list[PrizeMachine], adjusted=False) -> int:
     total_tokens = 0
     for prize_machine in list_of_prize_locations:
-        total_tokens += get_min_tokens(prize_machine)
+        total_tokens += get_min_tokens(prize_machine, adjusted)
     return total_tokens
 
 
@@ -90,6 +98,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Number combination validator")
     parser.add_argument("--determine_min_tokens", action='store_true',
                        help="Find the minimum number of tokens to win all prizes.")
+    parser.add_argument("--determine_min_tokens_adjusted", action='store_true',
+                       help="Find the minimum number of tokens to win all prizes if prize locations are adjusted by 10000000000000.")
     args = parser.parse_args()
 
     prize_machines = parse_input(INPUT)
@@ -97,4 +107,8 @@ if __name__ == "__main__":
         # 26599 for the input result
         # 480 for the small-input
         result = determine_min_tokens(prize_machines)
+        print(f"The number of button presses: {result}")
+    if args.determine_min_tokens_adjusted:
+        # Here it isn't feasible due to the problems size to get a result using my current approach.'
+        result = determine_min_tokens(prize_machines, adjusted=True)
         print(f"The number of button presses: {result}")

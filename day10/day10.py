@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import argparse
-from re import sub
 import numpy as np
 from typing import Optional
 

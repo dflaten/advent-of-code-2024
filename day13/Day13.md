@@ -28,4 +28,9 @@ Solve the problem as is.
 
 # Part 2
 Imagine the
-X and Y coordinates for the prizes are off by `10000000000000`. Now what is the minimum number of tokens needed to win the prize?
+X and Y coordinates for the prizes are off by `10000000000000`. Now what is the
+minimum number of tokens needed to win the prize?
+
+Issues: pulp doesn't work here due to the large parameter values. Basically would
+need another solver or to write my own solver to solve this problem. Will have to
+look more into this.

@@ -109,6 +109,6 @@ if __name__ == "__main__":
         result = determine_min_tokens(prize_machines)
         print(f"The number of button presses: {result}")
     if args.determine_min_tokens_adjusted:
-        # Here it isn't feasible due to the problems size to get a result using my current approach.'
+        # Here it isn't feasible due to the problems size to get a result using pulp.'
         result = determine_min_tokens(prize_machines, adjusted=True)
         print(f"The number of button presses: {result}")

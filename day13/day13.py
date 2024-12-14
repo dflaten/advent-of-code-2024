@@ -58,8 +58,8 @@ def get_min_tokens(prize_machine: PrizeMachine, adjusted=False) -> int:
     prob = LpProblem("Minimum_Number_Of_Tokens_Puzzle", LpMinimize)
 
     # LpInteger since we need whole numbers
-    a_presses = LpVariable("a", lowBound=0, upBound=100000000000000, cat=LpInteger)
-    b_presses = LpVariable("b", lowBound=0, upBound=100000000000000, cat=LpInteger)
+    a_presses = LpVariable("a", lowBound=0, cat=LpInteger)
+    b_presses = LpVariable("b", lowBound=0, cat=LpInteger)
 
     # Define objective function (minimize tokens)
     prob += 3 * a_presses + b_presses, "Number of tokens"
@@ -74,7 +74,7 @@ def get_min_tokens(prize_machine: PrizeMachine, adjusted=False) -> int:
     prob += prize_machine.button_a_x * a_presses + prize_machine.button_b_x * b_presses == x_prize_location, "X Movement"
     prob += prize_machine.button_a_y * a_presses + prize_machine.button_b_y * b_presses == y_prize_location, "Y Movement"
 
-    status = prob.solve(PULP_CBC_CMD(msg=True, presolved=False, options=['LpInteger=1*10**-100']))
+    status = prob.solve(PULP_CBC_CMD(msg=True))
     print(status)
 
     if status == LpStatusOptimal:

@@ -41,3 +41,18 @@ resulting in a GPS coordinate of 100 * 1 + 4 = 104.
 #...O..
 #......
 ```
+
+## Part 1
+When the small example is executed the map should look like this:
+```
+##########
+#.O.O.OOO#
+#........#
+#OO......#
+#OO@.....#
+#O#.....O#
+#O.....OO#
+#O.....OO#
+#OO....OO#
+##########
+```

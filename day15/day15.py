@@ -11,6 +11,13 @@ directions = {
     "v": (1, 0), # down
     "^": (-1, 0)  # up
 }
+# Would expect my directions to be more like this... need to think about this one a bit more.
+# directions = {
+#     ">": (1, 0),
+#     "<": (-1, 0),
+#     "^": (0, -1),
+#     "v": (0, 1)
+# }
 
 def build_map_and_instructions_from_input(path_to_file: str) -> tuple[np.ndarray, str]:
     '''
@@ -55,6 +62,9 @@ def get_next_position(current_position: tuple, direction: tuple) -> tuple:
     return (current_position[0] + direction[0], current_position[1] + direction[1])
 
 def traverse_map_calc_gps_sum(map: np.ndarray, instructions: str) -> int:
+    '''
+    Currently this isn't working right I'm pushing boxes through walls...
+    '''
     robot_location = find_robot_location(map)
     updated_map = map.copy()
     print("Starting Map")
@@ -100,14 +110,7 @@ def traverse_map_calc_gps_sum(map: np.ndarray, instructions: str) -> int:
     print("ending map")
     print(updated_map)
 
-            # build list of Os (starting with the robot@) until a # or . is hit while moving in the direction
-            # then
-
-        # check if you hit a # in next if you do continue with no changes
-
-        # Check locations in directions and build list of Os until a # is hit
-        #
-
+    #TODO: Calculate the gps sum of all boxes
 
     return 0
 

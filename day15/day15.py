@@ -8,8 +8,8 @@ INPUT = "small-input.txt"
 directions = {
     "<": (0, -1), # left
     ">": (0, 1),  # right
-    "v": (-1, 0), # down
-    "^": (1, 0)  # up
+    "v": (1, 0), # down
+    "^": (-1, 0)  # up
 }
 
 def build_map_and_instructions_from_input(path_to_file: str) -> tuple[np.ndarray, str]:
@@ -64,12 +64,14 @@ def traverse_map_calc_gps_sum(map: np.ndarray, instructions: str) -> int:
     for instruction in instructions:
         print("robot location")
         print(robot_location)
+        print("updated map")
+        print(updated_map)
         direction = directions[instruction]
         next_potential_location= get_next_position(robot_location, direction)
         if (updated_map[next_potential_location]) == "#":
             continue
         elif (updated_map[next_potential_location]) == ".":
-            updated_map[robot_location] = "O"
+            updated_map[robot_location] = "."
             updated_map[next_potential_location] = "@"
             robot_location = next_potential_location
             continue
@@ -77,15 +79,23 @@ def traverse_map_calc_gps_sum(map: np.ndarray, instructions: str) -> int:
             print("next potential location")
             print(next_potential_location)
             end_box_chain = next_potential_location
-            while updated_map[end_box_chain] == "O":
-                end_box_chain = get_next_position(end_box_chain, direction)
-            print("end box chain")
-            print(end_box_chain)
-            if updated_map[get_next_position(end_box_chain, direction)] == ".":
+            if get_next_position(end_box_chain, direction) == "#":
                 updated_map[robot_location] = "."
                 updated_map[next_potential_location] = "@"
                 robot_location = next_potential_location
                 updated_map[end_box_chain] = "O"
+            else:
+                # Loop for chain of boxes
+                while updated_map[end_box_chain] == "O":
+                    if get_next_position(end_box_chain, direction) == "#":
+                        break
+                    end_box_chain = get_next_position(end_box_chain, direction)
+                updated_map[robot_location] = "."
+                updated_map[next_potential_location] = "@"
+                robot_location = next_potential_location
+                updated_map[end_box_chain] = "O"
+            print("end box chain")
+            print(end_box_chain)
 
     print("ending map")
     print(updated_map)

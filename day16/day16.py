@@ -99,7 +99,7 @@ def build_graph(maze):
 
     return vertices, edges
 
-def find_way_out_with_lowest_score(map: np.ndarray) -> Optional[float]:
+def find_way_out_with_lowest_score(map: np.ndarray) -> tuple[float, int]:
     '''
     Find the way out of the map with the lowest score.
     '''
@@ -112,7 +112,7 @@ def find_way_out_with_lowest_score(map: np.ndarray) -> Optional[float]:
     start_vertex = (start_pos[0], start_pos[1], 0)
 
     # Run Dijkstra's algorithm
-    distances, previous = dijkstra(vertices, edges, start_vertex)
+    distances, previous, unique_points = dijkstra(vertices, edges, start_vertex, end_pos)
 
     # Check all possible end directions and find minimum
     min_distance = float('infinity')
@@ -121,17 +121,24 @@ def find_way_out_with_lowest_score(map: np.ndarray) -> Optional[float]:
         if end_vertex in distances:
             min_distance = min(min_distance, distances[end_vertex])
 
-    return min_distance if min_distance != float('infinity') else None
+    return (min_distance, unique_points)
 
 
-def dijkstra(vertices, edges, start):
+def dijkstra(vertices, edges, start_vertex, end_pos):
+    # Here i need to track the number of unique vertices(ignoring direction) in all the shortest paths.
+    unique_points = set()
     distances = {vertex: float('infinity') for vertex in vertices}
-    distances[start] = 0
-    pq = [(0, start)]
+    distances[start_vertex] = 0
+    pq = [(0, start_vertex, [(start_vertex[0], start_vertex[1])])]
     previous = {vertex: None for vertex in vertices}
 
     while pq:
-        current_distance, current_vertex = heapq.heappop(pq)
+        current_distance, current_vertex, path= heapq.heappop(pq)
+        current_point = path[-1]
+        if current_point == end_pos:
+            print("Found the end")
+            print(path)
+            unique_points.update(path)
 
         if current_distance > distances[current_vertex]:
             continue
@@ -142,14 +149,16 @@ def dijkstra(vertices, edges, start):
             if distance < distances[neighbor]:
                 distances[neighbor] = distance
                 previous[neighbor] = current_vertex
-                heapq.heappush(pq, (distance, neighbor))
+                heapq.heappush(pq, (distance, neighbor, path + [(neighbor[0], neighbor[1])]))
 
-    return distances, previous
+    return distances, previous, len(unique_points)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Number combination validator")
     parser.add_argument("--find_way_out", action='store_true',
+                       help="Find the way out of the map with the lowest score.")
+    parser.add_argument("--find_tiles_part_of_shortest_paths", action='store_true',
                        help="Find the way out of the map with the lowest score.")
     args = parser.parse_args()
     maze = build_maze_and_instructions_from_input(INPUT)
@@ -157,3 +166,8 @@ if __name__ == "__main__":
     if args.find_way_out:
         result = find_way_out_with_lowest_score(maze)
         print(f"The score of the shortest map is: {result}")
+    if args.find_tiles_part_of_shortest_paths:
+        # 437 is too low.
+        result, unique_points = find_way_out_with_lowest_score(maze)
+        print(f"The score of the shortest map is: {result}")
+        print(f"The number of unique tiles in the shortest map is: {unique_points}")

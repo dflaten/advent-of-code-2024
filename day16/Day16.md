@@ -32,3 +32,6 @@ What is the lowest score a reindeer could possibly get?
 
 ### Solution
 Dijkstra's Algorithm is a good solution for this problem.
+
+## Part 2:
+Find the count of the number of unique points in all the best paths.

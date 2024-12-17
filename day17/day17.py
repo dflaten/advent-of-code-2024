@@ -2,6 +2,7 @@
 import argparse
 
 INPUT = "input.txt"
+PROGRAM_OUTPUT_TO_GENERATE_REGISTER_A = 'program_output.txt'
 
 def parse_input_into_registers_and_instructions(input) -> tuple[int, int, int, list[int]]:
     with open(input, 'r') as file:
@@ -78,6 +79,7 @@ def run_instructions(register_a, register_b, register_c, instructions) -> str:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Advent of Code 2024 - Day 17")
     parser.add_argument("--run_instructions", action='store_true', help="Run instructions on Chronospatial Computer")
+    parser.add_argument("--generate_register_a", action='store_true', help="Generate Register A for program output")
     args = parser.parse_args()
     register_a, register_b, register_c, instructions = parse_input_into_registers_and_instructions(INPUT)
     if args.run_instructions:

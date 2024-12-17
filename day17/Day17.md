@@ -72,3 +72,10 @@ After the above program halts, its final output will be: 4,6,3,5,6,3,5,2,1,0.
 
 # Part 1
 Once the program is run what do you get if you use commas to join the values it output into a single string?
+
+# Part 2
+Given the same input program, what is the value that needs to be put into register a to produce the same output
+as the current input program.
+
+So `1,5,7,4,1,6,0,3,0` was the answer in part 1. What is the lowest value that can be put into register A
+to produce this output again?

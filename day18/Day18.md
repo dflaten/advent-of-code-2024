@@ -40,3 +40,9 @@ Once an item has fallen, that space will be corrupted and you will not be able t
 What is the minimum number of steps needed to reach the exit safetly?
 
 You start at the top left and end at the bottom right.
+
+# Part 2
+Say you need to know at what number of blockers dropped the map becomes completely blocked?
+
+## Solution
+Use binary search to find at what time the path becomes blocked.

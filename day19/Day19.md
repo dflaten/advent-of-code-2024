@@ -35,3 +35,5 @@ Where the top line are the kind of towewls you have and the rest of the lines ar
 of the patterns can you make with the towels you have?
 
 ## Part 2
+Of all the patterns that can be made how many different ways can they be made?
+Add up and return the result for all of them.

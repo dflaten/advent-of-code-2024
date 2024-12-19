@@ -20,21 +20,29 @@ def parse_towels_and_patterns_from_file(path_to_file: str) -> tuple[set[str], li
     return towels, patterns
 
 def can_create_pattern(towels: set[str], towel_pattern: str) -> bool:
-    # check if a substring from the towel is in the pattern, starting with the whole string
-    # and then moving to smaller substrings starting at the beginning of the string.
-    # If the entire string can be made by substring in towels return true else return false.
-    if not towel_pattern:
-        return True
-    for i in range(1, len(towel_pattern) + 1):
-        prefix = towel_pattern[:i]
-        #print(f"prefix, {prefix} in towels: {prefix in towels}")
-        if prefix in towels:
-            #print(f"Remaining: {towel_pattern[i:]}")
-            remaining = towel_pattern[i:]
-            if can_create_pattern(towels, remaining):
+    # Use memoization to store results of subproblems
+    memo = {}
+
+    def check_pattern_dynamic(start: int) -> bool:
+        # Base case: if we've reached the end of the pattern
+        if start == len(towel_pattern):
+            return True
+
+        # If we've already solved this subproblem
+        if start in memo:
+            return memo[start]
+
+        # Try all possible prefixes from this position
+        for i in range(start + 1, len(towel_pattern) + 1):
+            prefix = towel_pattern[start:i]
+            if prefix in towels and check_pattern_dynamic(i):
+                memo[start] = True
                 return True
-    #print(f"Cannot make {towel_pattern} with {towels}")
-    return False
+
+        memo[start] = False
+        return False
+
+    return check_pattern_dynamic(0)
 
 def find_possible_count_of_patterns(towels: set[str], towel_patterns: list[str]) -> int:
     '''

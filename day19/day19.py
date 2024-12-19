@@ -24,7 +24,7 @@ def can_create_pattern(towels: set[str], towel_pattern: str) -> bool:
     memo = {}
 
     def check_pattern_dynamic(start: int) -> bool:
-        # Base case: if we've reached the end of the pattern
+        # Base case
         if start == len(towel_pattern):
             return True
 

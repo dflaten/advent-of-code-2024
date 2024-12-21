@@ -186,8 +186,8 @@ if __name__ == "__main__":
         print(f"The score of the shortest map is: {shortest_map}")
         print(f"Found {len(list_of_maps)} maps with cheats.")
         #print(actual_map)
-        # result = find_way_out_with_lowest_score(maze)
-        # print(f"The score of the shortest map is: {result}")
+        result = find_way_out_with_lowest_score(maze)
+        print(f"The score of the shortest map is: {result}")
     if args.find_tiles_part_of_shortest_paths:
         # 437 is too low.
         result, unique_points = find_way_out_with_lowest_score(maze)

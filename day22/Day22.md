@@ -1,7 +1,5 @@
 # Day 22: Monkey Market
 
-Given a list of buyers numbers predict the 2000th number for each buyer.
-
 Each buyer's secret number evolves into the next secret number inthe sequence via the
 following process:
 
@@ -26,3 +24,30 @@ Each step of the above process involves mixing and pruning:
     Then, the secret number becomes the result of that operation. (If the secret number is
     100000000 and you were to prune the secret number, the secret number would become
     16113920.)
+
+# Part 1
+Given a list of buyers numbers predict the 2000th number for each buyer.
+
+# Part 2
+Assuming the price is the final digit in each number then the numbers and their price
+differences look like this (for one buyer with a starting number of 123):
+
+```
+123: 3
+15887950: 0 (-3)
+16495136: 6 (6)
+527345: 5 (-1)
+704524: 4 (-1)
+1553684: 4 (0)
+12683156: 6 (2)
+11100544: 4 (-2)
+12249484: 4 (0)
+7753432: 2 (-2)
+```
+
+If you want to find the sequence of 4 price changes with the largest price you could sell
+for all the buyers what is the largest amount you could gain? The sequence must be the
+same across all buyers.
+
+Solution Notes:
+For each buyer I need to generate a list of potential selections

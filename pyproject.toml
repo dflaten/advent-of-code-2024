@@ -7,6 +7,7 @@ dependencies = [
     "pyright",
     "ruff == 0.7.2",
     "pytest",
+    "networkx",
     "numpy",
     "pulp>=2.9.0",
 ]

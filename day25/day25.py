@@ -2,17 +2,9 @@
 #!/usr/bin/env python
 import argparse
 import numpy as np
-import heapq
-from typing import Optional
 
-INPUT = "small-input.txt"
+INPUT = "input.txt"
 
-directions = [
-    (0, 1),  # right
-    (1, 0),  # down
-    (0, -1), # left
-    (-1, 0)  # up
-]
 
 def parse_locks_and_keys(path_to_file: str) -> tuple[list[np.ndarray], list[np.ndarray]]:
     '''
@@ -44,14 +36,20 @@ def find_key_lock_combos(locks: list[np.ndarray], keys: list[np.ndarray]) -> int
     '''
     Find how many unique lock/key pairs "fit".
     To fit a key must have a smaller number or less "#" in each column than the lock.
+    Key height of # stack must be less than the height of the # column in the lock.
     '''
+    number_of_fits = 0
     for lock in locks:
         for key in keys:
-            if lock.shape == key.shape:
-                print(f"Lock: {lock}")
-                print(f"Key: {key}")
-                print()
-    return None
+            # number of # in each lock column
+            lock_column_counts = np.array(np.sum(lock == '#', axis=0))
+            key_column_counts = np.sum(key == '#', axis=0)
+            sum_of_pins = np.add(lock_column_counts, key_column_counts)
+
+            if np.all(sum_of_pins <= 5):
+                number_of_fits += 1
+
+    return number_of_fits
 
 
 if __name__ == "__main__":
@@ -62,3 +60,5 @@ if __name__ == "__main__":
 
     if args.find_key_lock_combos:
         locks, keys= parse_locks_and_keys(INPUT)
+        result = find_key_lock_combos(locks, keys)
+        print(f"Number of lock/key combos that fit: {result}")
